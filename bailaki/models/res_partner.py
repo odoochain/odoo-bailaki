@@ -83,3 +83,23 @@ class ResPartner(models.Model):
             "contacts.action_contacts").read()[0]
         action["domain"] = [("id", "in", self.referred_friend_ids.ids)]
         return action
+
+    def check_matches(self):
+        # self.relation_all_ids..filtered(
+        #     lambda x: x == self.id
+        # )
+
+        send_likes = self.relation_all_ids.filtered(
+            lambda x: x.this_partner_id == self and
+                      x.tab_id.code == 'send_likes'
+        )
+
+        receive_likes = self.relation_all_ids.filtered(
+            lambda x: x.other_partner_id == self
+        )
+
+        # TODO: comparar relações
+        for send in send_likes:
+            receive_likes.filtered(
+                lambda x: x.this_partner_id == send.other_partner_id
+            )
