@@ -1,0 +1,46 @@
+<odoo>
+
+    <!-- Relation Tab -->
+    <record id="tab_matches" model="res.partner.tab">
+        <field name="code">matches</field>
+        <field name="name">Matches</field>
+        <field name="contact_type">p</field>
+    </record>
+
+    <record id="tab_send_likes" model="res.partner.tab">
+        <field name="code">send_likes</field>
+        <field name="name">Send Likes</field>
+        <field name="contact_type">p</field>
+    </record>
+    <record id="tab_receive_likes" model="res.partner.tab">
+        <field name="code">receive_likes</field>
+        <field name="name">Receive Likes</field>
+        <field name="contact_type">p</field>
+    </record>
+
+
+    <!-- Relation Type-->
+    <record
+        id="relation_type_match"
+        model="res.partner.relation.type">
+        <field name="name">Match</field>
+        <field name="name_inverse">Match</field>
+        <field name="tab_left_id" ref="tab_matches" />
+        <field name="tab_right_id" ref="tab_matches" />
+        <field name="contact_type_left">p</field>
+        <field name="contact_type_right">p</field>
+        <field name="is_symmetric">1</field>
+    </record>
+
+    <record
+        id="relation_type_likes"
+        model="res.partner.relation.type">
+        <field name="name">Send Likes</field>
+        <field name="name_inverse">Receive Likes</field>
+        <field name="tab_left_id" ref="tab_send_likes" />
+        <field name="tab_right_id" ref="tab_receive_likes" />
+        <field name="contact_type_left">p</field>
+        <field name="contact_type_right">p</field>
+    </record>
+
+</odoo>
