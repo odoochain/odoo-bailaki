@@ -70,6 +70,7 @@ class ResPartner(models.Model):
                     (lambda x: haversine(x, self) <= self.referred_friend_max_distance)
                 )
                 rec.referred_friend_ids = friend_ids
+                self.check_matches()
 
     @api.depends('referred_friend_ids')
     def _compute_referred_friend_count(self):
@@ -84,22 +85,25 @@ class ResPartner(models.Model):
         action["domain"] = [("id", "in", self.referred_friend_ids.ids)]
         return action
 
+    @api.multi
     def check_matches(self):
-        # self.relation_all_ids..filtered(
-        #     lambda x: x == self.id
-        # )
 
         send_likes = self.relation_all_ids.filtered(
             lambda x: x.this_partner_id == self and
                       x.tab_id.code == 'send_likes'
         )
 
-        receive_likes = self.relation_all_ids.filtered(
-            lambda x: x.other_partner_id == self
-        )
-
-        # TODO: comparar relações
         for send in send_likes:
-            receive_likes.filtered(
-                lambda x: x.this_partner_id == send.other_partner_id
-            )
+            if not self.relation_all_ids.filtered(lambda x: x.tab_id.code == 'matches' and
+                           x.other_partner_id == send.other_partner_id):
+
+                match = self.relation_all_ids.filtered(
+                    lambda x: x.this_partner_id == self and
+                            x.tab_id.code == 'receive_likes' and
+                            x.other_partner_id == send.other_partner_id)
+
+                if match:
+                    self.env['res.partner.relation'].create({
+                             'type_id': self.env.ref('bailaki.relation_type_match').id,
+                             'left_partner_id': self.id,
+                             'right_partner_id': match.other_partner_id.id})
