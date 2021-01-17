@@ -70,6 +70,7 @@ class ResPartner(models.Model):
                     (lambda x: haversine(x, self) <= self.referred_friend_max_distance)
                 )
                 rec.referred_friend_ids = friend_ids
+                # Todo: esta checagem deve ocorrer quando houver alguma ateração nas relações entre parceiros
                 self.check_matches()
 
     @api.depends('referred_friend_ids')
@@ -103,7 +104,20 @@ class ResPartner(models.Model):
                             x.other_partner_id == send.other_partner_id)
 
                 if match:
+                    # Cria relação do tipo match
                     self.env['res.partner.relation'].create({
                              'type_id': self.env.ref('bailaki.relation_type_match').id,
                              'left_partner_id': self.id,
                              'right_partner_id': match.other_partner_id.id})
+
+                    # Envia notificação via OdooBot para os envolvidos no match
+                    self.env['mail.channel'].sudo().message_post(
+                        body='<p>Match entre %s e %s</p>' % (match.this_partner_id.name, match.other_partner_id.name),
+                        subtype='mail.mt_comment',
+                        model='mail.channel',
+                        partner_ids=[match.this_partner_id.id, match.other_partner_id.id]
+                    )
+
+                    # Todo: Envio de e-mail
+                    # self.env.ref('auth_signup.mail_template_user_signup_account_created'). \
+                    #         send_mail(self.id)
