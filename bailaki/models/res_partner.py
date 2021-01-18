@@ -54,11 +54,50 @@ class ResPartner(models.Model):
         digits=(16, 5),
     )
 
+    @api.depends('referred_friend_ids')
+    def _compute_referred_friend_count(self):
+        for rec in self:
+            rec.inspection_count = len(
+                rec.referred_friend_ids)
+
+    @api.depends('relation_all_ids')
+    def _compute_match_relation(self):
+        for rec in self:
+            send_likes = rec.relation_all_ids.filtered(
+                lambda x: x.this_partner_id == rec and
+                          x.tab_id.code == 'send_likes'
+            )
+            for send in send_likes:
+                if not rec.relation_all_ids.filtered(
+                        lambda x: x.tab_id.code == 'matches' and
+                                  x.other_partner_id == send.other_partner_id):
+
+                    match = rec.relation_all_ids.filtered(
+                        lambda x: x.this_partner_id == rec and
+                                  x.tab_id.code == 'receive_likes' and
+                                  x.other_partner_id == send.other_partner_id)
+
+                    if match:
+                        # Cria relação do tipo match
+                        rec.env['res.partner.relation'].create({
+                            'type_id': rec.env.ref('bailaki.relation_type_match').id,
+                            'left_partner_id': rec.id,
+                            'right_partner_id': match.other_partner_id.id})
+
+                        # Envia notificação via OdooBot para os envolvidos no match
+                        rec.env['mail.channel'].sudo().message_post(
+                            body='<p>Match entre %s e %s</p>' % (
+                            match.this_partner_id.name, match.other_partner_id.name),
+                            subtype='mail.mt_comment',
+                            model='mail.channel',
+                            partner_ids=[match.this_partner_id.id, match.other_partner_id.id]
+                        )
+
     @api.multi
     def _compute_referred_friend_ids(self):
         for rec in self:
-            if self.id and self.is_company == False:
-                friend_ids = self.env['res.partner'].\
+            if rec.id and rec.is_company == False:
+                friend_ids = rec.env['res.partner'].\
                     search([
                      '&', '&', '&', ('active', '=', True),
                     ('id', '!=', rec.id),
@@ -67,17 +106,11 @@ class ResPartner(models.Model):
                 ])
                 if friend_ids:
                     friend_ids = friend_ids.filtered(
-                    (lambda x: haversine(x, self) <= self.referred_friend_max_distance)
+                    (lambda x: haversine(x, rec) <= rec.referred_friend_max_distance)
                 )
                 rec.referred_friend_ids = friend_ids
                 # Todo: esta checagem deve ocorrer quando houver alguma ateração nas relações entre parceiros
-                self.check_matches()
-
-    @api.depends('referred_friend_ids')
-    def _compute_referred_friend_count(self):
-        for rec in self:
-            rec.inspection_count = len(
-                rec.referred_friend_ids)
+                rec._compute_match_relation()
 
     @api.multi
     def action_view_referred_friend(self):
@@ -85,39 +118,3 @@ class ResPartner(models.Model):
             "contacts.action_contacts").read()[0]
         action["domain"] = [("id", "in", self.referred_friend_ids.ids)]
         return action
-
-    @api.multi
-    def check_matches(self):
-
-        send_likes = self.relation_all_ids.filtered(
-            lambda x: x.this_partner_id == self and
-                      x.tab_id.code == 'send_likes'
-        )
-
-        for send in send_likes:
-            if not self.relation_all_ids.filtered(lambda x: x.tab_id.code == 'matches' and
-                           x.other_partner_id == send.other_partner_id):
-
-                match = self.relation_all_ids.filtered(
-                    lambda x: x.this_partner_id == self and
-                            x.tab_id.code == 'receive_likes' and
-                            x.other_partner_id == send.other_partner_id)
-
-                if match:
-                    # Cria relação do tipo match
-                    self.env['res.partner.relation'].create({
-                             'type_id': self.env.ref('bailaki.relation_type_match').id,
-                             'left_partner_id': self.id,
-                             'right_partner_id': match.other_partner_id.id})
-
-                    # Envia notificação via OdooBot para os envolvidos no match
-                    self.env['mail.channel'].sudo().message_post(
-                        body='<p>Match entre %s e %s</p>' % (match.this_partner_id.name, match.other_partner_id.name),
-                        subtype='mail.mt_comment',
-                        model='mail.channel',
-                        partner_ids=[match.this_partner_id.id, match.other_partner_id.id]
-                    )
-
-                    # Todo: Envio de e-mail
-                    # self.env.ref('auth_signup.mail_template_user_signup_account_created'). \
-                    #         send_mail(self.id)
