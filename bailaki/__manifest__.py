@@ -19,6 +19,7 @@
     'data': [
         'views/res_partner.xml',
         'data/res_partner_relation.xml',
+        'security/res_partner.xml'
     ],
     'demo': [
     ],

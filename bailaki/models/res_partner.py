@@ -97,7 +97,7 @@ class ResPartner(models.Model):
     def _compute_referred_friend_ids(self):
         for rec in self:
             if rec.id and rec.is_company == False:
-                friend_ids = rec.env['res.partner'].\
+                friend_ids = rec.env['res.partner'].sudo().\
                     search([
                      '&', '&', '&', ('active', '=', True),
                     ('id', '!=', rec.id),
