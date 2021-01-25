@@ -17,9 +17,13 @@
         'partner_contact_gender',
     ],
     'data': [
+        'security/res_partner.xml',
+        'security/res_partner_music_skill.xml',
+        'security/res_partner_music_genre.xml',
+        'views/res_partner_music_skill.xml',
+        'views/res_partner_music_genre.xml',
         'views/res_partner.xml',
         'data/res_partner_relation.xml',
-        'security/res_partner.xml'
     ],
     'demo': [
     ],
