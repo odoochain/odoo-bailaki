@@ -25,6 +25,19 @@ class ResPartner(models.Model):
 
     _inherit = 'res.partner'
 
+
+    profile_description = fields.Text(string="Profile Description", size=140)
+
+    music_genre_ids = fields.Many2many(
+        'res.partner.music.genre',
+        string='Music Genres'
+    )
+
+    music_skill_id = fields.Many2one(
+        'res.partner.music.skill',
+        string='Music Skill'
+    )
+
     referred_friend_ids = fields.Many2many('res.partner',
                                           string="Referred Friends",
                                           compute='_compute_referred_friend_ids')
