@@ -17,6 +17,7 @@
         'partner_contact_gender',
     ],
     'data': [
+        'security/ir.model.access.csv',
         'security/res_partner.xml',
         'security/res_partner_music_skill.xml',
         'security/res_partner_music_genre.xml',
