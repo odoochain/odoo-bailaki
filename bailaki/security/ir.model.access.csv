@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+bailaki_res_partner_relation,access_user_portal_relation,partner_multi_relation.model_res_partner_relation,base.group_portal,1,1,1,1

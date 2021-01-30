@@ -33,7 +33,7 @@
     </record>
 
     <record
-        id="relation_type_likes"
+        id="relation_type_send_likes"
         model="res.partner.relation.type">
         <field name="name">Send Likes</field>
         <field name="name_inverse">Receive Likes</field>
