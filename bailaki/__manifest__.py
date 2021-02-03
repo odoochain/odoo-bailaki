@@ -25,6 +25,7 @@
         'views/res_partner_music_skill.xml',
         'views/res_partner_music_genre.xml',
         'views/res_partner.xml',
+        'views/templates.xml',
         'data/res_partner_relation.xml',
     ],
     'demo': [
