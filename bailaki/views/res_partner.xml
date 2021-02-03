@@ -30,7 +30,9 @@
             <xpath expr="//page[@name='personal_information_page']//group[@name='personal_information_group']">
                 <field name="music_genre_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
                 <field name="music_skill_id"/>
-                <field name="referred_friend_gender"/>
+                <field name="interest_male_gender"/>
+                <field name="interest_female_gender"/>
+                <field name="interest_other_genres"/>
                 <field name="referred_friend_max_distance"/>
                 <field name="partner_current_latitude"/>
                 <field name="partner_current_longitude"/>

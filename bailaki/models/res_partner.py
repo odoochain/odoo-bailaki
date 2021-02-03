@@ -51,11 +51,17 @@ class ResPartner(models.Model):
         default=25,
     )
 
-    referred_friend_gender = fields.Selection([
-        ('male', 'Male'),
-        ('female', 'Female'),
-        ('other', 'Other')
-    ])
+    interest_male_gender = fields.Boolean(
+        string='Interest in the male gender',
+        default=False)
+
+    interest_female_gender = fields.Boolean(
+        string='Interest in the female gender',
+        default=False)
+
+    interest_other_genres = fields.Boolean(
+        string='Interest in other genres',
+        default=False)
 
     partner_current_latitude = fields.Float(
         string='Geo Current Latitude',
@@ -110,11 +116,20 @@ class ResPartner(models.Model):
     def _compute_referred_friend_ids(self):
         for rec in self:
             if rec.id and rec.is_company == False:
+
+                genres = []
+                if rec.interest_male_gender:
+                    genres.append('male')
+                if rec.interest_female_gender:
+                    genres.append('female')
+                if rec.interest_other_genres:
+                    genres.append('other')
+
                 friend_ids = rec.env['res.partner'].sudo().\
                     search([
-                     '&', '&', '&', ('active', '=', True),
+                     '&', '&', '&', '&', ('active', '=', True),
                     ('id', '!=', rec.id),
-                    ('gender', '=', rec.referred_friend_gender),
+                    ('gender', 'in', genres),
                     ('is_company', '=', False),
                 ])
                 if friend_ids:

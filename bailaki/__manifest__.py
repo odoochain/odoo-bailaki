@@ -15,6 +15,7 @@
         'partner_contact_birthdate',
         'partner_contact_nationality',
         'partner_contact_gender',
+        'event',
     ],
     'data': [
         'security/ir.model.access.csv',
