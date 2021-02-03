@@ -25,22 +25,25 @@ class ResPartner(models.Model):
 
     _inherit = 'res.partner'
 
-
     profile_description = fields.Text(string="Profile Description", size=140)
+
+    res_partner_image_ids = fields.One2many(
+        'res.partner.image',
+        'res_partner_id',
+        string='Images')
 
     music_genre_ids = fields.Many2many(
         'res.partner.music.genre',
-        string='Music Genres'
-    )
+        string='Music Genres')
 
     music_skill_id = fields.Many2one(
         'res.partner.music.skill',
-        string='Music Skill'
-    )
+        string='Music Skill')
 
-    referred_friend_ids = fields.Many2many('res.partner',
-                                          string="Referred Friends",
-                                          compute='_compute_referred_friend_ids')
+    referred_friend_ids = fields.Many2many(
+        'res.partner',
+        string="Referred Friends",
+        compute='_compute_referred_friend_ids')
 
     referred_friend_count = fields.Integer(
         compute="_compute_referred_friend_count",
@@ -48,8 +51,7 @@ class ResPartner(models.Model):
 
     referred_friend_max_distance = fields.Integer(
         string="Referred Friend Max Distance",
-        default=25,
-    )
+        default=25)
 
     interest_male_gender = fields.Boolean(
         string='Interest in the male gender',
@@ -65,13 +67,11 @@ class ResPartner(models.Model):
 
     partner_current_latitude = fields.Float(
         string='Geo Current Latitude',
-        digits=(16, 5),
-    )
+        digits=(16, 5))
 
     partner_current_longitude = fields.Float(
         string='Geo Current Longitude',
-        digits=(16, 5),
-    )
+        digits=(16, 5))
 
     @api.depends('referred_friend_ids')
     def _compute_referred_friend_count(self):
@@ -127,7 +127,7 @@ class ResPartner(models.Model):
 
                 friend_ids = rec.env['res.partner'].sudo().\
                     search([
-                     '&', '&', '&', '&', ('active', '=', True),
+                     '&', '&', '&', ('active', '=', True),
                     ('id', '!=', rec.id),
                     ('gender', 'in', genres),
                     ('is_company', '=', False),
@@ -146,3 +146,12 @@ class ResPartner(models.Model):
             "contacts.action_contacts").read()[0]
         action["domain"] = [("id", "in", self.referred_friend_ids.ids)]
         return action
+
+
+class ResPartnerImage(models.Model):
+    _name = 'res.partner.image'
+    _description = 'Partner Image'
+
+    name = fields.Char('Name')
+    image = fields.Binary('Image', attachment=True)
+    res_partner_id = fields.Many2one('res.partner', 'Related partner', copy=True)
