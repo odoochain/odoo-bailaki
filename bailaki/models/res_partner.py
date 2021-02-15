@@ -10,7 +10,12 @@ def haversine(a, b):
     r = 6371
 
     # Converte coordenadas de graus para radianos
-    lon1, lat1, lon2, lat2 = map(radians, [a['partner_current_longitude'], a['partner_current_latitude'], b['partner_current_longitude'], b['partner_current_latitude']])
+    lon1, lat1, lon2, lat2 = map(radians, [
+        a['partner_current_longitude'],
+        a['partner_current_latitude'],
+        b['partner_current_longitude'],
+        b['partner_current_latitude']
+    ])
 
     # Formula de Haversine
     dlon = lon2 - lon1
@@ -109,7 +114,9 @@ class ResPartner(models.Model):
                             match.this_partner_id.name, match.other_partner_id.name),
                             subtype='mail.mt_comment',
                             model='mail.channel',
-                            partner_ids=[match.this_partner_id.id, match.other_partner_id.id]
+                            partner_ids=[
+                                match.this_partner_id.id,
+                                match.other_partner_id.id]
                         )
 
     @api.multi
@@ -125,19 +132,27 @@ class ResPartner(models.Model):
                 if rec.interest_other_genres:
                     genres.append('other')
 
-                friend_ids = rec.env['res.partner'].sudo().\
+                friend_ids = rec.env['res.partner'].sudo(). \
                     search([
-                     '&', '&', '&', ('active', '=', True),
-                    ('id', '!=', rec.id),
-                    ('gender', 'in', genres),
-                    ('is_company', '=', False),
-                ])
+                        '&', '&', '&', ('active', '=', True),
+                        ('id', '!=', rec.id),
+                        ('gender', 'in', genres),
+                        ('is_company', '=', False),
+                    ])
                 if friend_ids:
                     friend_ids = friend_ids.filtered(
-                    (lambda x: haversine(x, rec) <= rec.referred_friend_max_distance)
-                )
+                        (lambda x: set(x.music_genre_ids).
+                         intersection(rec.music_genre_ids))
+                    )
+                if friend_ids:
+                    friend_ids = friend_ids.filtered(
+                        (lambda x: haversine(x, rec) <=
+                                   rec.referred_friend_max_distance)
+                    )
+
                 rec.referred_friend_ids = friend_ids
-                # Todo: esta checagem deve ocorrer quando houver alguma ateração nas relações entre parceiros
+                # Todo: esta checagem deve ocorrer quando houver alguma
+                #  ateração nas relações entre parceiros
                 rec._compute_match_relation()
 
     @api.multi
