@@ -17,6 +17,16 @@
         <field name="name">Receive Likes</field>
         <field name="contact_type">p</field>
     </record>
+    <record id="tab_send_dislikes" model="res.partner.tab">
+        <field name="code">send_dislikes</field>
+        <field name="name">Send Dislikes</field>
+        <field name="contact_type">p</field>
+    </record>
+    <record id="tab_receive_dislikes" model="res.partner.tab">
+        <field name="code">receive_dislikes</field>
+        <field name="name">Receive Dislikes</field>
+        <field name="contact_type">p</field>
+    </record>
 
 
     <!-- Relation Type-->
@@ -39,6 +49,17 @@
         <field name="name_inverse">Receive Likes</field>
         <field name="tab_left_id" ref="tab_send_likes" />
         <field name="tab_right_id" ref="tab_receive_likes" />
+        <field name="contact_type_left">p</field>
+        <field name="contact_type_right">p</field>
+    </record>
+
+    <record
+        id="relation_type_send_dislikes"
+        model="res.partner.relation.type">
+        <field name="name">Send Dislikes</field>
+        <field name="name_inverse">Receive Dislikes</field>
+        <field name="tab_left_id" ref="tab_send_dislikes" />
+        <field name="tab_right_id" ref="tab_receive_dislikes" />
         <field name="contact_type_left">p</field>
         <field name="contact_type_right">p</field>
     </record>
