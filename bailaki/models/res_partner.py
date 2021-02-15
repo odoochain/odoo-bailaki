@@ -124,6 +124,11 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.id and rec.is_company == False:
 
+                send_dislikes = rec.relation_all_ids.filtered(
+                    lambda x: x.this_partner_id == rec and
+                              x.tab_id.code == 'send_dislikes'
+                )
+
                 genres = []
                 if rec.interest_male_gender:
                     genres.append('male')
@@ -134,20 +139,24 @@ class ResPartner(models.Model):
 
                 friend_ids = rec.env['res.partner'].sudo(). \
                     search([
-                        '&', '&', '&', ('active', '=', True),
+                        '&', '&', '&', '&',
                         ('id', '!=', rec.id),
+                        ('id', 'not in', [send_dislikes.other_partner_id.id]),
+                        ('active', '=', True),
                         ('gender', 'in', genres),
                         ('is_company', '=', False),
                     ])
-                if friend_ids:
-                    friend_ids = friend_ids.filtered(
-                        (lambda x: set(x.music_genre_ids).
-                         intersection(rec.music_genre_ids))
-                    )
+
                 if friend_ids:
                     friend_ids = friend_ids.filtered(
                         (lambda x: haversine(x, rec) <=
                                    rec.referred_friend_max_distance)
+                    )
+
+                if friend_ids:
+                    friend_ids = friend_ids.filtered(
+                        (lambda x: set(x.music_genre_ids).
+                         intersection(rec.music_genre_ids))
                     )
 
                 rec.referred_friend_ids = friend_ids
