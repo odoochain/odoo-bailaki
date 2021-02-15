@@ -128,6 +128,10 @@ class ResPartner(models.Model):
                     lambda x: x.this_partner_id == rec and
                               x.tab_id.code == 'send_dislikes'
                 )
+                unmatches = rec.relation_all_ids.filtered(
+                    lambda x: x.this_partner_id == rec and
+                              x.tab_id.code == 'unmatches'
+                )
 
                 genres = []
                 if rec.interest_male_gender:
@@ -142,6 +146,7 @@ class ResPartner(models.Model):
                         '&', '&', '&', '&',
                         ('id', '!=', rec.id),
                         ('id', 'not in', [send_dislikes.other_partner_id.id]),
+                        ('id', 'not in', [unmatches.other_partner_id.id]),
                         ('active', '=', True),
                         ('gender', 'in', genres),
                         ('is_company', '=', False),
