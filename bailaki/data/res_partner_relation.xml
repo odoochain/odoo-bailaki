@@ -84,4 +84,16 @@
         <field name="contact_type_right">p</field>
     </record>
 
+    <!-- Cron-->
+    <record model="ir.cron" id="unmatch_relation_clean_cron">
+        <field name="name">Bailaki: clean unmatch relations</field>
+        <field name="model_id" ref="model_res_partner_relation"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_unmatch_relation_clean()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+
 </odoo>

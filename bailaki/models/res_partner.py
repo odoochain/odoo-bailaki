@@ -124,14 +124,24 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.id and rec.is_company == False:
 
-                send_dislikes = rec.relation_all_ids.filtered(
+
+                block_partner_ids = []
+                send_dislikes_ids = rec.relation_all_ids.filtered(
                     lambda x: x.this_partner_id == rec and
                               x.tab_id.code == 'send_dislikes'
                 )
-                unmatches = rec.relation_all_ids.filtered(
+
+                for send_dislikes_id in send_dislikes_ids:
+                    block_partner_ids.append(send_dislikes_id.other_partner_id.id)
+
+
+                unmatches_ids = rec.relation_all_ids.filtered(
                     lambda x: x.this_partner_id == rec and
                               x.tab_id.code == 'unmatches'
                 )
+
+                for unmatches_id in unmatches_ids:
+                    block_partner_ids.append(unmatches_id.other_partner_id.id)
 
                 genres = []
                 if rec.interest_male_gender:
@@ -145,8 +155,7 @@ class ResPartner(models.Model):
                     search([
                         '&', '&', '&', '&',
                         ('id', '!=', rec.id),
-                        ('id', 'not in', [send_dislikes.other_partner_id.id]),
-                        ('id', 'not in', [unmatches.other_partner_id.id]),
+                        ('id', 'not in', block_partner_ids),
                         ('active', '=', True),
                         ('gender', 'in', genres),
                         ('is_company', '=', False),
@@ -175,7 +184,6 @@ class ResPartner(models.Model):
             "contacts.action_contacts").read()[0]
         action["domain"] = [("id", "in", self.referred_friend_ids.ids)]
         return action
-
 
 class ResPartnerImage(models.Model):
     _name = 'res.partner.image'
