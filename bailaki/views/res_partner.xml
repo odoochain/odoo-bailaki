@@ -34,9 +34,13 @@
                 <field name="interest_female_gender"/>
                 <field name="interest_other_genres"/>
                 <field name="referred_friend_max_distance"/>
+                <field name="referred_friend_min_age"/>
+                <field name="referred_friend_max_age"/>
                 <field name="partner_current_latitude"/>
                 <field name="partner_current_longitude"/>
                 <field name="profile_description"/>
+                <field name="enable_message_notification"/>
+                <field name="enable_match_notification"/>
             </xpath>
         </field>
     </record>
