@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models, _
 from math import radians, cos, sin, asin, sqrt
+from dateutil.relativedelta import relativedelta
 
 # Formula de Haversine
 def haversine(a, b):
@@ -58,6 +59,15 @@ class ResPartner(models.Model):
         string="Referred Friend Max Distance",
         default=25)
 
+    referred_friend_min_age = fields.Integer(
+        string="Referred Friend Min Age",
+        default=18)
+
+    referred_friend_max_age = fields.Integer(
+        string="Referred Friend Max Age",
+        default=99
+    )
+
     interest_male_gender = fields.Boolean(
         string='Interest in the male gender',
         default=False)
@@ -77,6 +87,26 @@ class ResPartner(models.Model):
     partner_current_longitude = fields.Float(
         string='Geo Current Longitude',
         digits=(16, 5))
+
+    enable_match_notification = fields.Boolean(
+        string='Enable Match Notification',
+        default=True
+    )
+
+    enable_message_notification = fields.Boolean(
+        string='Enable Message Notification',
+        default=True
+    )
+
+    age = fields.Integer(string="Age", readonly=True, compute="_compute_age", store=True)
+
+    @api.depends("birthdate_date")
+    def _compute_age(self):
+        for record in self:
+            age = 0
+            if record.birthdate_date:
+                age = relativedelta(fields.Date.today(), record.birthdate_date).years
+            record.age = age
 
     @api.depends('referred_friend_ids')
     def _compute_referred_friend_count(self):
@@ -124,7 +154,6 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.id and rec.is_company == False:
 
-
                 block_partner_ids = []
                 send_dislikes_ids = rec.relation_all_ids.filtered(
                     lambda x: x.this_partner_id == rec and
@@ -159,6 +188,8 @@ class ResPartner(models.Model):
                         ('active', '=', True),
                         ('gender', 'in', genres),
                         ('is_company', '=', False),
+                        ('age', '>=', rec.referred_friend_min_age),
+                        ('age', '<=', rec.referred_friend_max_age),
                     ])
 
                 if friend_ids:
