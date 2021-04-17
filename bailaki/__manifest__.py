@@ -7,7 +7,7 @@
         Bailaki Backend""",
     'version': '12.0.1.0.0',
     'license': 'AGPL-3',
-    'author': 'Marcel Savegnago',
+    'author': 'Marcel Savegnago & Marcos Méndez',
     'website': 'https://popsolutions.co',
     'depends': [
         'partner_multi_relation_tabs',
