@@ -171,6 +171,14 @@ class ResPartner(models.Model):
 
                 for unmatches_id in unmatches_ids:
                     block_partner_ids.append(unmatches_id.other_partner_id.id)
+                    
+                matches_ids = rec.relation_all_ids.filtered(
+                    lambda x: x.this_partner_id == rec and
+                              x.tab_id.code == 'matches'
+                )
+
+                for matches_id in matches_ids:
+                    block_partner_ids.append(matches_id.other_partner_id.id)
 
                 genres = []
                 if rec.interest_male_gender:
