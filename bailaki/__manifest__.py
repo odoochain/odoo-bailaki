@@ -7,8 +7,8 @@
         Bailaki Backend""",
     'version': '12.0.1.0.0',
     'license': 'AGPL-3',
-    'author': 'Marcel Savegnago',
-    'website': 'https://popsolutions.co',
+    'author': "PopSolutions",
+    'website': "https://www.popsolutions.co",
     'depends': [
         'partner_multi_relation_tabs',
         'partner_contact_birthplace',
