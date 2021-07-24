@@ -149,6 +149,27 @@ class ResPartner(models.Model):
                                 match.other_partner_id.id]
                         )
 
+                        # Criar o Canal
+                        mail_channel = self.env['mail.channel'].create({
+                            'name': '(' + str(rec.id) + ' - ' + str(match.other_partner_id.id) + ')',
+                            'alias_name': '(' + str(rec.id) + ' - ' + str(match.other_partner_id.id) + ')',
+                            'channel_type': 'chat',
+                            'public': 'private',
+                            # The user must join the group
+                            # 'channel_partner_ids': [(4, self.env.user.partner_id.id), (4, rec.id)]
+                        })
+
+                        if mail_channel:
+                            #Alterando "is_pinned" de mail.channel.partner (Que foi inserido automaticamente ao criar o mail.channel)
+                            mail_channel_partner = rec.env['mail.channel.partner'].search(
+                                [['channel_id', '=', mail_channel.id]]);
+                            mail_channel_partner.write({'is_pinned': True});
+
+                            #Inserindo o outro usuário que curtiu
+                            rec.env['mail.channel.partner'].create({
+                                'partner_id': rec.id,
+                                'channel_id': mail_channel.id,
+                                'is_pined': True})
     @api.multi
     def _compute_referred_friend_ids(self):
         for rec in self:
