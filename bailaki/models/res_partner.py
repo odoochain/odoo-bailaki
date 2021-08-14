@@ -151,7 +151,7 @@ class ResPartner(models.Model):
 
                         # Criar o Canal
                         mail_channel = self.env['mail.channel'].create({
-                            'name': '(' + str(rec.id) + ' - ' + str(match.other_partner_id.id) + ')',
+                            'name': str(rec.id) + ',' + str(match.other_partner_id.id),
                             'alias_name': '(' + str(rec.id) + ' - ' + str(match.other_partner_id.id) + ')',
                             'channel_type': 'chat',
                             'public': 'private',
