@@ -155,9 +155,15 @@ class ResPartner(models.Model):
                             'alias_name': '(' + str(rec.id) + ' - ' + str(match.other_partner_id.id) + ')',
                             'channel_type': 'chat',
                             'public': 'private',
+                            'channel_partner_ids': [(4, rec.id), (4, match.other_partner_id.id)],
                             # The user must join the group
                             # 'channel_partner_ids': [(4, self.env.user.partner_id.id), (4, rec.id)]
                         })
+
+                        queryDeletarOutrosPartnersIds = 'delete from mail_channel_partner where channel_id = ' + str(mail_channel.id) + ' and partner_id not in (' + str(rec.id) + ',' + str(match.other_partner_id.id) + ')';
+
+                        # Deletar partner que possam ter sido incluídos pelas heranças (a rotina mail.channel.create criar o relacionamento com self.env.user.partner_id.id automaticamente)
+                        self.env.cr.execute(queryDeletarOutrosPartnersIds);
 
                         if mail_channel:
                             #Alterando "is_pinned" de mail.channel.partner (Que foi inserido automaticamente ao criar o mail.channel)
@@ -165,11 +171,6 @@ class ResPartner(models.Model):
                                 [['channel_id', '=', mail_channel.id]]);
                             mail_channel_partner.write({'is_pinned': True});
 
-                            #Inserindo o outro usuário que curtiu
-                            rec.env['mail.channel.partner'].create({
-                                'partner_id': rec.id,
-                                'channel_id': mail_channel.id,
-                                'is_pined': True})
     @api.multi
     def _compute_referred_friend_ids(self):
         for rec in self:
