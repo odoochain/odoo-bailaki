@@ -149,14 +149,7 @@ class ResPartner(models.Model):
                                 match.other_partner_id.id]
                         )
                         
-                        # Cria canal de comunicação entre o usuário e o parceiro
-                        rec.env['mail.channel'].create({
-                            'name': rec.env.ref(left_partner_id","right_partner_id),
-                            'chanel_last_seen_partner_ids': rec.id(this_partner_id),
-                            'chanel_last_seen_partner_ids': rec.id(other_partner_id),
-
-                        
-
+                      
                         # Criar o Canal
                         mail_channel = self.env['mail.channel'].create({
                             'name': str(rec.id) + ',' + str(match.other_partner_id.id),
