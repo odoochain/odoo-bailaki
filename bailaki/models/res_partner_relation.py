@@ -20,3 +20,14 @@ class ResPartnerRelation(models.Model):
             if (relation.create_date):
                 if (relation.create_date + timedelta(days=30) < fields.datetime.now()):
                     relation.unlink()
+
+    @api.model_create_multi
+    @api.returns('self', lambda value: value.id)
+    def bailaki_SendLike(self, values):
+        res = super(ResPartnerRelation, self).create(values)
+        res_partner = self.sudo().env['res.partner'].search(
+            [['id', '=', values[0]['left_partner_id']]]);
+        if res_partner:
+            res_partner._compute_match_relation();
+            print(res_partner.name)
+        return res
