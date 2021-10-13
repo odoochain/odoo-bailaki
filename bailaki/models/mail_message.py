@@ -23,3 +23,27 @@ class MailMessage(models.Model):
             body=value['body'],
             message_type='comment',
             subtype='mail.mt_comment')
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        idLastMessage = 0
+
+        for arg in args:
+            if ((arg[0] == 'id') and (arg[1] == '>') and (str(arg[2]).isdigit())): #  sample: ["id", ">","400"]
+                idLastMessage = int(arg[2]);
+
+            if (arg[0] == 'res_id'):
+                channel_id = arg[2];
+
+        res = super(MailMessage, self)._search(
+            args, offset=offset, limit=limit, order=order,
+            count=count, access_rights_uid=access_rights_uid)
+
+        if idLastMessage > 0:
+            self.env['hermes.monitor'].create(
+                    {'partner_id': self.env.user.partner_id.id,
+                     'idlastmessage': idLastMessage,
+                     'channel_id': channel_id}
+                );
+
+        return res
