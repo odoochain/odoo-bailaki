@@ -1,16 +1,27 @@
 # Copyright 2021 Pop Solutions
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models, http
+from odoo import api, models, http, tools
 from odoo.http import request, Response
 import json
-
 
 class odooController(http.Controller):
   @http.route('/bailaki/channels_amounts/', auth='public', type="http")
   def index(self, **kw):
+    channel_idSql = ''
+    partner_idSql = ''
+    partner_id = 0
     try:
-      partner_id = int(kw['partner_id'])
+      if 'channel_id' in kw:
+        channel_idSql = kw['channel_id']
+        int(channel_idSql) #only validation int tyoe
+        channel_idSql = ' and mcp.channel_id = ' + channel_idSql
+
+      if 'partner_id' in kw:
+        partner_id = int(kw['partner_id'])
+        partner_idSql = ' and partner_id = ' + str(partner_id)
+
+      getImages = str(kw['getImages']).upper() == 'TRUE'
     except:
       return Response(json.dumps({'data': {'status': 400, 'response': 'Invalid Params'}}), status=400,
                       content_type="application/json")
@@ -23,7 +34,8 @@ select t.channelId,
        rp_left.name leftPartnerName,
        t.rightPartnerId,
        rp_rigth.name rigthPartnerName,
-       t.lastMessage
+       t.lastMessage,
+       t.amount_newmessages
   from res_partner rp_left,
        res_partner rp_rigth,
        (
@@ -57,7 +69,7 @@ select t.channelId,
                ) lastMessage
           from mail_channel_partner mcp,
                mail_channel mcn
-         where partner_id = ''' + str(partner_id) + '''
+         where 0 = 0 ''' + partner_idSql + channel_idSql + '''
            and mcn.id = mcp.channel_id 
            and mcn.channel_type = 'chat'    
      ) t
@@ -71,15 +83,58 @@ select t.channelId,
     channels = request.env.cr.fetchall()
 
     for channel in channels:
+
+      photoLeft = None
+      photoRight = None
+
+      if getImages:
+        def getPhoto(res_partner_id):
+          if res_partner_id == partner_id:
+            return None
+
+          photo = None
+
+          res_partner_image = request.env['res.partner.image'].sudo().search([('res_partner_id', '=', res_partner_id)], limit=1)
+
+          if res_partner_image:
+            # images = tools.image_get_resized_images(res_partner_image[0].image, return_medium=False)
+            # images = tools.image_resize_image_small(res_partner_image[0].image, avoid_if_small = True)
+            # photo = images.decode("utf-8")
+            photo = res_partner_image[0].image.decode("utf-8")
+
+          return photo
+
+          # res_partner = request.env['res.partner'].sudo().search([('id', '=', res_partner_id)], limit=1).read(['image_small'])
+          #
+          # if res_partner:
+          #   photo = res_partner[0]['image_small'].decode("utf-8")
+          #
+          # return photo
+
+        photoLeft = getPhoto(channel[3])
+        photoRight = getPhoto(channel[5])
+
+      partnerLeft = {
+        'id': channel[3],
+        'name': channel[4],
+        'photo': photoLeft
+      }
+
+      partnerRight = {
+        'id': channel[5],
+        'name': channel[6],
+        'photo': photoRight
+      }
+
       item = {
         'channelId': channel[0],
         'name': channel[1],
         'idlastreadmessage': channel[2],
         'leftPartnerId': channel[3],
-        'leftPartnerName': channel[4],
         'rightPartnerId': channel[5],
-        'rigthPartnerName': channel[6],
-        'lastMessage': channel[7]
+        'lastMessage': channel[7],
+        'amount_newmessages': channel[8],
+        'partners': [partnerLeft, partnerRight]
       }
 
       channelsJson.append(item)
