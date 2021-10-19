@@ -172,6 +172,17 @@ class ResPartner(models.Model):
                                 [['channel_id', '=', mail_channel.id]]);
                             mail_channel_partner.write({'is_pinned': True});
 
+                        #Criar notificação mobile
+
+                        mobileNitification = [{
+                            'author_id': rec.id,
+                            'res_id': mail_channel.id,
+                            'subject': 'Novo Parceiro',
+                            'body': rec.name + ' também quer dançar com você'}
+                        ]
+
+                        self.env['mail.message'].sendModileNotification(mobileNitification, 0)
+
     @api.multi
     def _compute_referred_friend_ids(self):
         for rec in self:
