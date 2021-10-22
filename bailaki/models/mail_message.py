@@ -5,9 +5,31 @@ from odoo import api, models, http, tools
 from odoo.http import request, Response
 import json
 
+
 class odooController(http.Controller):
+  @http.route('/bailaki/printlog/', auth='public', type="http")
+  def printlog(self, **kw):
+    print('** Mobile Bailaki Log: ' + kw['msg'])
+    return Response(json.dumps({'data': {'status': 200}}), status=200, content_type="application/json")
+
+  @http.route('/bailaki/ir_config_parameters/', auth='public', type="http")
+  def ir_config_parameters(self, **kw):
+    ir_config_parameters = request.env['ir.config_parameter'].sudo().search([('key', 'like', 'MobileBailakiParams.%')])
+    ir_config_parametersReturn = []
+
+    for ir_config_parameter in ir_config_parameters:
+      ir_config_parametersReturn.append({
+        'id': ir_config_parameter['id'],
+        'key': ir_config_parameter['key'],
+        'value': ir_config_parameter['value']
+      })
+
+    data = {'status': 200, 'response': ir_config_parametersReturn}
+    return Response(json.dumps({'data': data}), status=200, content_type="application/json")
+
+
   @http.route('/bailaki/channels_amounts/', auth='public', type="http")
-  def index(self, **kw):
+  def channels_amounts(self, **kw):
     channel_idSql = ''
     partner_idSql = ''
     partner_id = 0
