@@ -7,6 +7,53 @@ import json
 
 
 class odooController(http.Controller):
+  @http.route('/bailaki/events/', auth='public', type="http")
+  def get_events(self, **kw):
+    query = """
+select ee.id,
+       ee.state,
+       ee.name,
+       ee.date_begin,
+       ee.date_end,
+       ee.organizer_id,
+       rp.name organizer_name, 
+       rp.street,
+       rp.zip,
+       rp.city,
+       st.name statename,
+       rp.partner_latitude,
+       rp.partner_longitude 
+  from event_event ee,
+       res_partner rp left join res_country_state st on (st.id = rp.state_id)
+ where rp.id = ee.address_id
+   and ee.state = 'confirm'  
+    """
+
+    eventsJson = []
+
+    request.env.cr.execute(query)
+    events = request.env.cr.fetchall()
+
+    for event in events:
+      eventsJson.append({
+        'id': event[0],
+        'state': event[1],
+        'name': event[2],
+        'date_begin': str(event[3]),
+        'date_end': str(event[4]),
+        'organizer_id': event[5],
+        'organizer_name': event[6],
+        'street': event[7],
+        'zip': event[8],
+        'city': event[9],
+        'statename': event[10],
+        'partner_latitude': event[11],
+        'partner_longitude': event[12]
+      })
+
+    data = {'status': 200, 'response': eventsJson}
+    return Response(json.dumps({'data': data}), status=200, content_type="application/json")
+
   @http.route('/bailaki/printlog/', auth='public', type="http")
   def printlog(self, **kw):
     print('** Mobile Bailaki Log: ' + kw['msg'])
