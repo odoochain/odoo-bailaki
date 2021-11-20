@@ -143,7 +143,17 @@ select t.channelId,
            and mcn.channel_type = 'chat'    
      ) t
  where rp_left.id = t.leftPartnerId
-   and rp_rigth.id = t.rightPartnerId  
+   and rp_rigth.id = t.rightPartnerId
+   and not exists 
+       (--disregarding Unmatch
+       select rpr.id 
+         from res_partner_relation rpr
+        where type_id = 9
+          and (   (rpr.left_partner_id = t.leftPartnerId and rpr.right_partner_id = t.rightPartnerId)
+               or (rpr.left_partner_id = t.rightPartnerId and rpr.right_partner_id = t.leftPartnerId)
+              )
+         limit 1
+       )        
         '''
 
     channelsJson = []
