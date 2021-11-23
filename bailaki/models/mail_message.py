@@ -21,8 +21,8 @@ select ee.id,
        rp.zip,
        rp.city,
        st.name statename,
-       rp.partner_latitude,
-       rp.partner_longitude 
+       coalesce(rp.partner_current_latitude, 0) partner_current_latitude,
+       coalesce(rp.partner_current_longitude, 0) partner_current_longitude
   from event_event ee,
        res_partner rp left join res_country_state st on (st.id = rp.state_id)
  where rp.id = ee.address_id
@@ -49,8 +49,8 @@ select ee.id,
         'zip': event[8],
         'city': event[9],
         'statename': event[10],
-        'partner_latitude': event[11],
-        'partner_longitude': event[12],
+        'partner_current_latitude': event[11],
+        'partner_current_longitude': event[12],
         'website_url': event_event.website_url
       })
 
@@ -151,7 +151,7 @@ select t.channelId,
        (--disregarding Unmatch
        select rpr.id 
          from res_partner_relation rpr
-        where type_id = 9
+        where type_id = (select id from res_partner_relation_type rprt where name = 'Unmatch')
           and (   (rpr.left_partner_id = t.leftPartnerId and rpr.right_partner_id = t.rightPartnerId)
                or (rpr.left_partner_id = t.rightPartnerId and rpr.right_partner_id = t.leftPartnerId)
               )
