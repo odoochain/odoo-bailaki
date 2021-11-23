@@ -35,6 +35,8 @@ select ee.id,
     events = request.env.cr.fetchall()
 
     for event in events:
+      event_event = request.env['event.event'].search([('id', '=', event[0])])
+
       eventsJson.append({
         'id': event[0],
         'state': event[1],
@@ -48,7 +50,8 @@ select ee.id,
         'city': event[9],
         'statename': event[10],
         'partner_latitude': event[11],
-        'partner_longitude': event[12]
+        'partner_longitude': event[12],
+        'website_url': event_event.website_url
       })
 
     data = {'status': 200, 'response': eventsJson}
