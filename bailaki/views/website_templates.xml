@@ -11,7 +11,6 @@
 				<div t-field="event.organizer_id.image" t-options="{'widget': 'image'}"/>
 				<br/>
 
-				<div t-field="event.organizer_id.image" t-options="{'widget': 'image'}"/>
 			</xpath>
 
 	        <xpath expr="//i[@class='fa fa-clock-o']" position="replace">
