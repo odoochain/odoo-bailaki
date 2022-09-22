@@ -14,10 +14,6 @@
         <field name="name">Bailaki Admin User</field>
         <field name="category_id" ref="module_bailaki_category"/>
     </record>
-    <record id="group_bailaki_admin_user" model="res.groups">
-        <field name="name">Bailaki Admin User</field>
-        <field name="category_id" ref="module_bailaki_category"/>
-    </record>
 
     <record model="ir.rule" id="res_partner_portal_public_rule">
         <field name="name">res_partner: portal/public: read access on my commercial partner</field>

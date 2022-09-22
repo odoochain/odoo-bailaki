@@ -22,7 +22,8 @@ select ee.id,
        rp.city,
        st.name statename,
        coalesce(rp.partner_current_latitude, 0) partner_current_latitude,
-       coalesce(rp.partner_current_longitude, 0) partner_current_longitude
+       coalesce(rp.partner_current_longitude, 0) partner_current_longitude,
+       event_type_id
   from event_event ee,
        res_partner rp left join res_country_state st on (st.id = rp.state_id)
  where rp.id = ee.address_id
@@ -51,7 +52,8 @@ select ee.id,
         'statename': event[10],
         'partner_current_latitude': event[11],
         'partner_current_longitude': event[12],
-        'website_url': event_event.website_url
+        'website_url': event_event.website_url,
+        'event_type_id': event[13]
       })
 
     data = {'status': 200, 'response': eventsJson}
