@@ -63,7 +63,7 @@ Images
 
 Contributors
 ------------
-
+* https://github.com/allegro/pyhermes
 * Firstname Lastname <email.address@example.org>
 * Second Person <second.person@example.org>
 
