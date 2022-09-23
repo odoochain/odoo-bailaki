@@ -270,7 +270,7 @@ class MailMessage(models.Model):
 
     if processLastMessage:
       # todo - Improvement: run hermes_monitor_only 1 time validation when starting odoo
-      self.env.cr.execute("select id from ir_module_module where name = 'hermes-message' limit 1")
+      self.env.cr.execute("select id from ir_module_module where name = 'hermes_message' limit 1")
       hermes_message_model = self.env.cr.fetchall()
 
       hermes_monitor_installed = not (len(hermes_message_model) == 0)

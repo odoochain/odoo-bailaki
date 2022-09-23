@@ -16,7 +16,7 @@
         'partner_contact_nationality',
         'partner_contact_gender',
         'event',
-        'hermes-message',
+        'hermes_message',
     ],
     'data': [
         'security/res_partner.xml',
