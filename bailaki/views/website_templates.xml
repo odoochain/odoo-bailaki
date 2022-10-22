@@ -10,7 +10,6 @@
 			<xpath expr="//div[@t-field='event.description']" position="before">
 				<div t-field="event.organizer_id.image" t-options="{'widget': 'image'}"/>
 				<br/>
-
 			</xpath>
 
 	        <xpath expr="//i[@class='fa fa-clock-o']" position="replace">
@@ -18,7 +17,7 @@
 			<xpath expr="//i[@class='fa fa-clock-o']" position="replace">
 	    	</xpath>
 
-			<xpath expr="//div[@class='o_wevent_sidebar_block'][1]" position="replace">
+			<xpath expr="//div[@class='card mt-3']" position="replace">
 			</xpath>
 
 			<xpath expr="//div[@t-field='event.organizer_id']" position="replace">
