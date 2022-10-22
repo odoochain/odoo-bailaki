@@ -10,16 +10,14 @@
 			<xpath expr="//div[@t-field='event.description']" position="before">
 				<div t-field="event.organizer_id.image" t-options="{'widget': 'image'}"/>
 				<br/>
-
 			</xpath>
 
 	        <xpath expr="//i[@class='fa fa-clock-o']" position="replace">
 	    	</xpath>
 			<xpath expr="//i[@class='fa fa-clock-o']" position="replace">
 	    	</xpath>
-			<xpath expr="//span[@t-field='event.with_context(tz=event.date_tz).date_begin']" position="replace">
-			</xpath>
-			<xpath expr="//span[@t-field='event.with_context(tz=event.date_tz).date_end']" position="replace">
+
+			<xpath expr="//div[@class='card mt-3']" position="replace">
 			</xpath>
 
 			<xpath expr="//div[@t-field='event.organizer_id']" position="replace">
